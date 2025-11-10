@@ -1,0 +1,9 @@
+# docker/flink_data/flink-conf.yaml
+state.checkpoints.dir: file:///opt/flink/checkpoints
+state.savepoints.dir:  file:///opt/flink/recovery
+state.backend: filesystem
+# optional tuning
+# state.checkpoints.num-retained: 5
+# state.checkpoints.dir: file:///opt/flink/checkpoints
+# state.savepoints.dir: file:///opt/flink/recovery
+

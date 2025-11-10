@@ -1,0 +1,54 @@
+services:
+  jobmanager:
+    image: flink:1.17.1
+    container_name: flink-jobmanager
+    restart: unless-stopped
+    hostname: jobmanager
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 1
+    # environment:
+    #   - |
+    #     FLINK_PROPERTIES=
+    #     jobmanager.rpc.address: jobmanager
+    #     taskmanager.numberOfTaskSlots: 2
+    #     parallelism.default: 1
+    #     state.checkpoints.dir: file:///opt/flink/checkpoints
+    #     state.savepoints.dir: file:///opt/flink/recovery
+    volumes:
+      - ./flink_data/recovery:/opt/flink/recovery
+      - ./flink_data/checkpoints:/opt/flink/checkpoints
+      - ./flink_data/web-upload:/opt/flink/web-upload
+      # - ./flink_data/conf:/opt/flink/conf
+    networks:
+      - kafka_network
+
+  taskmanager:
+    image: flink:1.17.1
+    container_name: flink-taskmanager
+    restart: unless-stopped
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 1
+    volumes:
+      # - ./flink_data/conf:/opt/flink/conf
+      - ./flink_data/checkpoints:/opt/flink/checkpoints
+      - ./flink_data/recovery:/opt/flink/recovery
+    networks:
+      - kafka_network
+    depends_on:
+      - jobmanager
+
+networks:
+  kafka_network:
+    external: true
